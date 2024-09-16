@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Req,
@@ -8,7 +10,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
-import { ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { MessageDto } from './dto/message.dto';
 import { UserPayload } from '../auth/UserPayload';
 import { Request } from 'express';
@@ -21,7 +27,14 @@ export class MessageController {
   @ApiOkResponse({
     description: 'send new message to provided roomId.',
   })
+  @ApiUnauthorizedResponse({
+    description: 'Bearer token is required for this endpoint.',
+  })
+  @ApiNotFoundResponse({
+    description: 'An exist roomId is required.',
+  })
   @UseGuards(JwtGuard)
+  @HttpCode(HttpStatus.OK)
   @Post(':id')
   newMessage(
     @Body(new ValidationPipe()) msgDto: MessageDto,

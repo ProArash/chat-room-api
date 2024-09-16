@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Req,
@@ -9,7 +11,13 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { RoomService } from './room.service';
-import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { RoomDto } from './dto/room.dto';
 import { UserPayload } from '../auth/UserPayload';
 import { Request } from 'express';
@@ -20,7 +28,13 @@ export class RoomController {
   constructor(private roomService: RoomService) {}
 
   @ApiCreatedResponse({
-    description: 'Will create new room and assicoate userId to it.',
+    description: 'Will create new room and associate userId to it.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Bearer token is required for this endpoint.',
+  })
+  @ApiConflictResponse({
+    description: 'Duplicate room name is not allowed.',
   })
   @UseGuards(JwtGuard)
   @Post()
@@ -32,7 +46,14 @@ export class RoomController {
   @ApiOkResponse({
     description: 'return messages of a room by roomId.',
   })
+  @ApiUnauthorizedResponse({
+    description: 'Bearer token is required for this endpoint.',
+  })
+  @ApiNotFoundResponse({
+    description: 'An exist roomId is required.',
+  })
   @UseGuards(JwtGuard)
+  @HttpCode(HttpStatus.OK)
   @Get(':id')
   getRoomMessages(@Param('id') roomId: string) {
     return this.roomService.getRoomMessages(Number(roomId));
@@ -41,7 +62,14 @@ export class RoomController {
   @ApiOkResponse({
     description: 'return messages of a room by roomId.',
   })
+  @ApiUnauthorizedResponse({
+    description: 'Bearer token is required for this endpoint.',
+  })
+  @ApiNotFoundResponse({
+    description: 'An exist roomId is required.',
+  })
   @UseGuards(JwtGuard)
+  @HttpCode(HttpStatus.OK)
   @Post('join/:id')
   addUserToRoom(@Param('id') roomId: string, @Req() req: Request) {
     const user: UserPayload = req['user'];
@@ -51,7 +79,14 @@ export class RoomController {
   @ApiOkResponse({
     description: 'return messages of a room by roomId.',
   })
+  @ApiUnauthorizedResponse({
+    description: 'Bearer token is required for this endpoint.',
+  })
+  @ApiNotFoundResponse({
+    description: 'An exist roomId is required.',
+  })
   @UseGuards(JwtGuard)
+  @HttpCode(HttpStatus.OK)
   @Get('members/:id')
   getRoomMembers(@Param('id') roomId: string) {
     return this.roomService.getRoomMembers(Number(roomId));
