@@ -2,12 +2,14 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma.client';
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { UserPayload } from './UserPayload';
 import { JwtService } from '@nestjs/jwt';
+import { RefreshDto } from './dto/refresh.dto';
 
 @Injectable()
 export class AuthService {
@@ -52,7 +54,7 @@ export class AuthService {
     }
     user = await this.prismaService.user.create({
       data: {
-        username: authDto.username,
+        username: authDto.username.toLowerCase(),
         password: await bcrypt.hash(authDto.password, 10),
       },
     });
@@ -70,5 +72,25 @@ export class AuthService {
     return await this.jwtService.signAsync(payload, {
       expiresIn: '10d',
     });
+  }
+
+  async refreshToken(
+    refreshDto: RefreshDto,
+  ): Promise<{ access_token: string }> {
+    try {
+      const result: UserPayload = await this.jwtService.verifyAsync(
+        refreshDto.refreshToken,
+      );
+      const payload: UserPayload = {
+        id: result.id,
+        username: result.username,
+      };
+      return {
+        access_token: await this.jwtService.signAsync(payload),
+      };
+    } catch (error) {
+      console.log('refresh token err: ', error);
+      throw new UnauthorizedException('Invalid or expired token.');
+    }
   }
 }

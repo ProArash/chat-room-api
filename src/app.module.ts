@@ -1,11 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './api/auth/auth.service';
 import { AuthModule } from './api/auth/auth.module';
-import { ChatService } from './api/chat/chat.service';
-import { ChatModule } from './api/chat/chat.module';
 import { ConfigModule } from '@nestjs/config';
-import { RoomService } from './api/room/room.service';
 import { RoomModule } from './api/room/room.module';
+import { MessageModule } from './api/message/message.module';
 
 @Module({
   imports: [
@@ -13,9 +10,8 @@ import { RoomModule } from './api/room/room.module';
       isGlobal: true,
     }),
     AuthModule,
-    ChatModule,
     RoomModule,
+    MessageModule,
   ],
-  providers: [AuthService, ChatService, RoomService],
 })
 export class AppModule {}

@@ -25,19 +25,23 @@ model User {
 }
 
 model Message {
-  id     Int    @id @default(autoincrement())
-  text   String
-  user   User?  @relation(fields: [userId], references: [id])
-  room   Room?  @relation(fields: [roomId], references: [id])
-  roomId Int?
-  userId Int?
+  id        Int      @id @default(autoincrement())
+  text      String
+  user      User?    @relation(fields: [userId], references: [id])
+  room      Room?    @relation(fields: [roomId], references: [id])
+  roomId    Int?
+  userId    Int?
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 }
 
 model Room {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  messages Message[]
-  owner    User?     @relation(fields: [ownerId], references: [id], name: "RoomOwner")
-  ownerId  Int?
-  members  User[]    @relation(name: "RoomMember")
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  messages  Message[]
+  owner     User?     @relation(fields: [ownerId], references: [id], name: "RoomOwner")
+  ownerId   Int?
+  members   User[]    @relation(name: "RoomMember")
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
 }

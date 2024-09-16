@@ -1,4 +1,4 @@
 export interface UserPayload {
-  id: number;
-  username: string;
+  id?: number;
+  username?: string;
 }
